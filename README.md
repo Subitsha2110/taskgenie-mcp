@@ -336,6 +336,18 @@ curl -X POST http://localhost:8001/task \
 4. Click the ⚡ icon in the toolbar to open the popup
 5. Or: highlight any text on a webpage → right-click → **"⚡ Create Task with TaskGenie"**
 
+### 🎤 Voice Input
+TaskGenie supports hands-free task creation via the Web Speech API:
+1. Open any webpage in Chrome (e.g. google.com)
+2. Click the ⚡ TaskGenie icon in the toolbar
+3. Click the **🎤 mic button** inside the text box
+4. Allow microphone access when Chrome asks
+5. Speak your task — e.g. *"fix the payment bug before Friday urgently"*
+6. Your words appear in the text box automatically
+7. Hit **Send Task** — the AI pipeline handles the rest
+
+> Voice input injects speech recognition into the active tab, bypassing Chrome extension popup restrictions.
+
 ---
 
 ## 🧪 Testing
