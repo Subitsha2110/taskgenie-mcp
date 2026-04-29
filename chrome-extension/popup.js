@@ -2,76 +2,73 @@
 const MCP_URL = "http://127.0.0.1:8001/task";
 
 // ── Voice Input ───────────────────────────────────────────────────────────────
-let recognition = null;
 let isListening = false;
 
-function initVoice() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) return null;
-
-  const r = new SpeechRecognition();
-  r.continuous = false;       // stop after first pause
-  r.interimResults = true;    // show words as they're spoken
-  r.lang = "en-US";
-
+function toggleVoice() {
   const micBtn      = document.getElementById("micBtn");
   const inputEl     = document.getElementById("input");
   const voiceStatus = document.getElementById("voiceStatus");
 
-  // Show interim (live) transcript while speaking
-  r.onresult = (event) => {
-    let interim = "";
-    let final   = "";
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const t = event.results[i][0].transcript;
-      if (event.results[i].isFinal) final += t;
-      else interim += t;
-    }
-    inputEl.value = final || interim;
-  };
-
-  r.onstart = () => {
-    isListening = true;
-    micBtn.classList.add("listening");
-    micBtn.textContent = "⏹";
-    micBtn.title = "Click to stop";
-    voiceStatus.classList.add("visible");
-  };
-
-  r.onend = () => {
+  if (isListening) {
     isListening = false;
     micBtn.classList.remove("listening");
     micBtn.textContent = "🎤";
     micBtn.title = "Click to speak";
     voiceStatus.classList.remove("visible");
-  };
-
-  r.onerror = (event) => {
-    isListening = false;
-    micBtn.classList.remove("listening");
-    micBtn.textContent = "🎤";
-    voiceStatus.classList.remove("visible");
-    if (event.error === "not-allowed") {
-      debug("Microphone permission denied. Allow mic access in Chrome.");
-    }
-  };
-
-  return r;
-}
-
-function toggleVoice() {
-  if (!recognition) {
-    recognition = initVoice();
-  }
-  if (!recognition) {
-    debug("Voice input not supported in this browser.");
     return;
   }
-  if (isListening) {
-    recognition.stop();
-  } else {
-    recognition.start();
-  }
+
+  // Inject speech recognition into the active tab (bypasses popup CSP restriction)
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs[0]) {
+      debug("No active tab found.");
+      return;
+    }
+
+    isListening = true;
+    micBtn.classList.add("listening");
+    micBtn.textContent = "⏹";
+    micBtn.title = "Click to stop";
+    voiceStatus.classList.add("visible");
+
+    chrome.scripting.executeScript({
+      target: { tabId: tabs[0].id },
+      func: () => {
+        return new Promise((resolve) => {
+          const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+          if (!SR) { resolve({ error: "not_supported" }); return; }
+          const r = new SR();
+          r.lang = "en-US";
+          r.interimResults = false;
+          r.maxAlternatives = 1;
+          r.onresult = (e) => resolve({ transcript: e.results[0][0].transcript });
+          r.onerror  = (e) => resolve({ error: e.error });
+          r.onend    = () => {};
+          r.start();
+        });
+      }
+    }, (results) => {
+      isListening = false;
+      micBtn.classList.remove("listening");
+      micBtn.textContent = "🎤";
+      micBtn.title = "Click to speak";
+      voiceStatus.classList.remove("visible");
+
+      if (chrome.runtime.lastError) {
+        debug("Cannot inject into this tab. Open a regular webpage first.");
+        return;
+      }
+
+      const result = results?.[0]?.result;
+      if (!result) { debug("No result from speech recognition."); return; }
+      if (result.error === "not_supported") { debug("Speech recognition not supported."); return; }
+      if (result.error) { debug("Mic error: " + result.error + ". Allow mic access for this page."); return; }
+      if (result.transcript) {
+        inputEl.value = result.transcript;
+        debug("🎤 Heard: " + result.transcript);
+      }
+    });
+  });
 }
 
 function debug(msg) {

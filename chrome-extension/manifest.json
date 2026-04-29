@@ -6,8 +6,7 @@
   "permissions": [
     "contextMenus",
     "activeTab",
-    "scripting",
-    "microphone"
+    "scripting"
   ],
   "host_permissions": [
     "http://localhost/*",
