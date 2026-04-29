@@ -35,6 +35,12 @@
     h1 { font-size: 16px; font-weight: 600; color: #fff; }
     .subtitle { font-size: 11px; color: #666; margin-top: 2px; }
 
+    /* Textarea wrapper for mic button overlay */
+    .textarea-wrapper {
+      position: relative;
+      margin-top: 0;
+    }
+
     textarea {
       width: 100%;
       height: 90px;
@@ -43,7 +49,7 @@
       border-radius: 10px;
       color: #f0f0f0;
       font-size: 13px;
-      padding: 12px;
+      padding: 12px 40px 12px 12px;
       resize: none;
       outline: none;
       transition: border-color 0.2s;
@@ -52,6 +58,52 @@
 
     textarea:focus { border-color: #6366f1; }
     textarea::placeholder { color: #444; }
+
+    /* Mic button inside textarea */
+    #micBtn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: none;
+      background: #2a2a2a;
+      color: #888;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      padding: 0;
+      flex: none;
+    }
+
+    #micBtn:hover { background: #3a3a3a; color: #fff; }
+
+    #micBtn.listening {
+      background: #ef444422;
+      color: #ef4444;
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 #ef444444; }
+      50%       { box-shadow: 0 0 0 6px #ef444400; }
+    }
+
+    /* Voice status bar */
+    #voiceStatus {
+      display: none;
+      margin-top: 6px;
+      font-size: 10px;
+      color: #ef4444;
+      text-align: center;
+      font-family: monospace;
+    }
+
+    #voiceStatus.visible { display: block; }
 
     .row {
       display: flex;
@@ -71,7 +123,7 @@
       cursor: pointer;
     }
 
-    button {
+    button#sendBtn {
       flex: 1;
       background: linear-gradient(135deg, #6366f1, #8b5cf6);
       border: none;
@@ -84,8 +136,8 @@
       transition: opacity 0.2s;
     }
 
-    button:hover { opacity: 0.85; }
-    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    button#sendBtn:hover { opacity: 0.85; }
+    button#sendBtn:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .result {
       margin-top: 14px;
@@ -98,7 +150,6 @@
     }
 
     .result.visible { display: block; }
-
     .result.success { border-color: #22c55e44; }
     .result.error   { border-color: #ef444444; }
 
@@ -150,11 +201,17 @@
     <div class="logo">⚡</div>
     <div>
       <h1>TaskGenie MCP</h1>
-      <div class="subtitle">Groq AI · Notion · Jira</div>
+      <div class="subtitle">Groq AI · Notion · Jira · Voice</div>
     </div>
   </div>
 
-  <textarea id="input" placeholder="e.g. Fix login bug before Friday urgently"></textarea>
+  <div class="textarea-wrapper">
+    <textarea id="input" placeholder="Type or 🎤 speak your task..."></textarea>
+    <button id="micBtn" title="Click to speak">🎤</button>
+  </div>
+
+  <!-- Voice status indicator -->
+  <div id="voiceStatus">🔴 Listening... speak your task</div>
 
   <div class="row">
     <select id="tools">
@@ -170,7 +227,7 @@
     <div id="resultBody"></div>
   </div>
 
-  <!-- debug bar — shows what's happening step by step -->
+  <!-- debug bar -->
   <div id="debug" style="display:none;margin-top:10px;padding:8px;background:#111;border-radius:6px;font-size:10px;color:#f59e0b;font-family:monospace;word-break:break-all;"></div>
 
   <script src="popup.js"></script>
