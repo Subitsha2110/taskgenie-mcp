@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "TaskGenie MCP",
+  "version": "2.0",
+  "description": "Highlight any text → right-click → create a real task via MCP server",
+  "permissions": [
+    "contextMenus",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "TaskGenie MCP"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src http://127.0.0.1:8001 http://localhost:8001;"
+  }
+}

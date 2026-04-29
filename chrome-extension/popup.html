@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TaskGenie MCP</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 360px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f0f0f;
+      color: #f0f0f0;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    h1 { font-size: 16px; font-weight: 600; color: #fff; }
+    .subtitle { font-size: 11px; color: #666; margin-top: 2px; }
+
+    textarea {
+      width: 100%;
+      height: 90px;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      color: #f0f0f0;
+      font-size: 13px;
+      padding: 12px;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s;
+      line-height: 1.5;
+    }
+
+    textarea:focus { border-color: #6366f1; }
+    textarea::placeholder { color: #444; }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    select {
+      flex: 1;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #f0f0f0;
+      font-size: 12px;
+      padding: 8px 10px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    button {
+      flex: 1;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    button:hover { opacity: 0.85; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .result {
+      margin-top: 14px;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
+      display: none;
+    }
+
+    .result.visible { display: block; }
+
+    .result.success { border-color: #22c55e44; }
+    .result.error   { border-color: #ef444444; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .badge.success { background: #22c55e22; color: #22c55e; }
+    .badge.error   { background: #ef444422; color: #ef4444; }
+
+    .field { margin-bottom: 5px; color: #aaa; }
+    .field span { color: #fff; font-weight: 500; }
+
+    .task-id {
+      margin-top: 8px;
+      padding: 6px 10px;
+      background: #111;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 11px;
+      color: #6366f1;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #ffffff44;
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo">⚡</div>
+    <div>
+      <h1>TaskGenie MCP</h1>
+      <div class="subtitle">Groq AI · Notion · Jira</div>
+    </div>
+  </div>
+
+  <textarea id="input" placeholder="e.g. Fix login bug before Friday urgently"></textarea>
+
+  <div class="row">
+    <select id="tools">
+      <option value="notion,jira">Auto (AI picks)</option>
+      <option value="notion">Notion only</option>
+      <option value="jira">Jira only</option>
+    </select>
+    <button id="sendBtn">Send Task</button>
+  </div>
+
+  <div class="result" id="result">
+    <div class="badge" id="badge"></div>
+    <div id="resultBody"></div>
+  </div>
+
+  <!-- debug bar — shows what's happening step by step -->
+  <div id="debug" style="display:none;margin-top:10px;padding:8px;background:#111;border-radius:6px;font-size:10px;color:#f59e0b;font-family:monospace;word-break:break-all;"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
